@@ -1,0 +1,53 @@
+{{ if var "NAME" }}name: {{ var "NAME" }}{{ else }}#name:{{ end }}
+{{ if var "TAGS" }}tags:{{ range var "TAGS" | split "," }}
+  - "{{ . }}"{{ end }}{{ end }}
+filebeat:
+  registry_file: /local/.filebeat
+  prospectors:
+    - type: log
+      json:
+        keys_under_root: true
+        overwrite_keys: true
+        add_error_key: true
+        message_key: message
+      paths:
+        - alloc/logs/*.stdout.*
+      exclude_files:
+        - nomadbeat
+      fields_under_root: true
+      fields:
+        stream: stdout
+        {{ if var "ENVIRONMENT" }}environment: {{ var "ENVIRONMENT" }}{{ else }}#environment:{{ end }}
+        {{ if or $nomad_vars $meta_vars }}nomad:{{ if $nomad_vars }}{{ range $nomad_vars | split "," }}
+          {{ if var . }}{{ . | replace "NOMAD_" "" | lower }}: {{ var . }}{{ end }}{{ end }}{{ end }}
+          {{ if $meta_vars }}meta:{{ range $meta_vars | split "," }}
+            {{ if var . }}{{ . | replace "NOMAD_META_" "" | lower }}: {{ var . }}{{ end }}{{ end }}{{ end }}{{ end }}
+    - type: log
+      json:
+        keys_under_root: true
+        overwrite_keys: true
+        add_error_key: true
+        {{ if var "JSON_MESSAGE_KEY" }}message_key: {{ var "JSON_MESSAGE_KEY" }}{{ end }}
+      paths:
+        - alloc/logs/*.stderr.*
+      exclude_files:
+        - nomadbeat
+      fields_under_root: true
+      fields:
+        stream: stderr
+        type: log
+        {{ if var "ENVIRONMENT" }}environment: {{ var "ENVIRONMENT" }}{{ else }}#environment:{{ end }}
+        {{ if or $nomad_vars $meta_vars }}nomad:{{ if $nomad_vars }}{{ range $nomad_vars | split "," }}
+          {{ if var . }}{{ . | replace "NOMAD_" "" | lower }}: {{ var . }}{{ end }}{{ end }}{{ end }}
+          {{ if $meta_vars }}meta:{{ range $meta_vars | split "," }}
+            {{ if var . }}{{ . | replace "NOMAD_META_" "" | lower }}: {{ var . }}{{ end }}{{ end }}{{ end }}{{ end }}
+output:
+{{ if var "ES_HOST" }}  elasticsearch:
+    hosts:{{ range var "ES_HOST" | split "," }}
+      - "{{ . }}"{{ end }}
+    username: {{ var "ES_USERNAME" | default "~" }}
+    password: {{ var "ES_PASSWORD" | default "~" }}{{ end }}
+logging:
+  level: warning
+  to_files: false
+  to_syslog: false
