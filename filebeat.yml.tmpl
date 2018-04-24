@@ -2,7 +2,7 @@
 {{ if var "TAGS" }}tags:{{ range var "TAGS" | split "," }}
   - "{{ . }}"{{ end }}{{ end }}
 filebeat:
-  registry_file: /local/.filebeat
+  registry_file: {{ var "NOMAD_TASK_DIR" }}/.filebeat
   prospectors:
     - type: log
       json:
@@ -11,7 +11,7 @@ filebeat:
         add_error_key: true
         message_key: message
       paths:
-        - alloc/logs/*.stdout.*
+        - {{ var "NOMAD_ALLOC_DIR" }}/logs/*.stdout.*
       exclude_files:
         - nomadbeat
       fields_under_root: true
@@ -23,13 +23,13 @@ filebeat:
           {{ if $meta_vars }}meta:{{ range $meta_vars | split "," }}
             {{ if var . }}{{ . | replace "NOMAD_META_" "" | lower }}: {{ var . }}{{ end }}{{ end }}{{ end }}{{ end }}
     - type: log
-      json:
+      {{ if var "ENABLE_JSON" }}json:
         keys_under_root: true
         overwrite_keys: true
         add_error_key: true
-        {{ if var "JSON_MESSAGE_KEY" }}message_key: {{ var "JSON_MESSAGE_KEY" }}{{ end }}
+        {{ if var "JSON_MESSAGE_KEY" }}message_key: {{ var "JSON_MESSAGE_KEY" }}{{ end }}{{ endif }}
       paths:
-        - alloc/logs/*.stderr.*
+        - {{ var "NOMAD_ALLOC_DIR" }}/logs/*.stderr.*
       exclude_files:
         - nomadbeat
       fields_under_root: true
@@ -48,6 +48,6 @@ output:
     username: {{ var "ES_USERNAME" | default "~" }}
     password: {{ var "ES_PASSWORD" | default "~" }}{{ end }}
 logging:
-  level: warning
+  level: info
   to_files: false
   to_syslog: false
