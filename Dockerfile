@@ -27,6 +27,7 @@ RUN set -ex \
   && echo "${FILEBEAT_SHA512}  filebeat.tgz" | sha512sum -c - \
   && tar xzf filebeat.tgz \
   && cp filebeat-*/filebeat /usr/local/bin \
+  && cp filebeat-*/fields.yml ./ \
   && rm -rf filebeat* \
   && apk del --virtual build-tools
 
