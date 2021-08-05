@@ -22,7 +22,21 @@ filebeat:
         {{ if $meta_vars }}nomad:
           meta:{{ range $meta_vars | split "," }}
             {{ if var . }}{{ . | replace "NOMAD_META_" "" | lower }}: {{ var . }}{{ end }}{{ end }}{{ end }}
+    {{ if var "AMP_FARM" }}
     - type: log
+      keys_under_root: true
+      overwrite_keys:
+      paths:
+      fields:
+        stream: stderr
+        type: log
+        {{ if var "ENVIRONMENT" }}environment: {{ var "ENVIRONMENT" }}{{ else }}#environment:{{ end }}
+        {{ if $meta_vars }}nomad:
+          meta:{{ range $meta_vars | split "," }}
+            {{ if var . }}{{ . | replace "NOMAD_META_" "" | lower }}: {{ var . }}{{ end }}{{ end }}{{ end }}
+        - {{ var "NOMAD_ALLOC_DIR" }}/logs/umd/* 
+   {{ end }} 
+   - type: log
       {{ if var "ENABLE_JSON" }}json:
         keys_under_root: true
         overwrite_keys: true
