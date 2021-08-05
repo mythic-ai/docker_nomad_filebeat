@@ -24,12 +24,18 @@ filebeat:
             {{ if var . }}{{ . | replace "NOMAD_META_" "" | lower }}: {{ var . }}{{ end }}{{ end }}{{ end }}
     {{ if var "AMP_FARM" }}
     - type: log
-      keys_under_root: true
+      {{ if var "ENABLE_JSON" }}json:
+        keys_under_root: true
+        overwrite_keys: true
+        {{ if var "ADD_JSON_ERROR_KEY" }}add_error_key: true{{ end }}
+        {{ if var "JSON_MESSAGE_KEY" }}message_key: {{ var "JSON_MESSAGE_KEY" }}{{ end }}{{ end }}
       paths:
-        - {{ var "NOMAD_ALLOC_DIR" }}/logs/umd/* 
+        - {{ var "NOMAD_ALLOC_DIR" }}/umd/*
+      exclude_files:
+        - {{ var "NOMAD_TASK_NAME" }}
+      fields_under_root: true
       fields:
-        stream: stderr
-        type: log
+        stream: stdout
         {{ if var "ENVIRONMENT" }}environment: {{ var "ENVIRONMENT" }}{{ else }}#environment:{{ end }}
         {{ if $meta_vars }}nomad:
           meta:{{ range $meta_vars | split "," }}
