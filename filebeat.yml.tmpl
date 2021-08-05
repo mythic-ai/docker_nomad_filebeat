@@ -25,7 +25,6 @@ filebeat:
     {{ if var "AMP_FARM" }}
     - type: log
       keys_under_root: true
-      overwrite_keys:
       paths:
         - {{ var "NOMAD_ALLOC_DIR" }}/logs/umd/* 
       fields:
