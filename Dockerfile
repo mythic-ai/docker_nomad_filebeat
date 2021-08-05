@@ -20,11 +20,9 @@ RUN set -ex \
   && tar xzf sigil.tgz -C /usr/local/bin \
   && rm sigil.tgz
 
-ENV FILEBEAT_VERSION=6.2.4
-ENV FILEBEAT_SHA512=19d0a93a42a758b8c9e71ca2691130fe5998fcb717019e29864f6ce0a21d4880c1654581220f0ce0f6118c914629df2baa91e95728f4e6a333666dffdf04df20
+ENV FILEBEAT_VERSION=7.14.0
 RUN set -ex \
   && curl -Lo filebeat.tgz "https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILEBEAT_VERSION}-linux-x86_64.tar.gz" \
-  && echo "${FILEBEAT_SHA512}  filebeat.tgz" | sha512sum -c - \
   && tar xzf filebeat.tgz \
   && cp filebeat-*/filebeat /usr/local/bin \
   && cp filebeat-*/fields.yml ./ \
