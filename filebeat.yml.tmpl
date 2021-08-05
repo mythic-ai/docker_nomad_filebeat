@@ -2,7 +2,8 @@
 {{ if var "TAGS" }}tags:{{ range var "TAGS" | split "," }}
   - "{{ . }}"{{ end }}{{ end }}
 filebeat:
-  registry_file: {{ var "NOMAD_TASK_DIR" }}/.filebeat
+  registry:
+    path: {{ var "NOMAD_TASK_DIR" }}/.filebeat
   inputs:
     - type: log
       {{ if var "ENABLE_JSON" }}json:
