@@ -3,7 +3,7 @@
   - "{{ . }}"{{ end }}{{ end }}
 filebeat:
   registry_file: {{ var "NOMAD_TASK_DIR" }}/.filebeat
-  prospectors:
+  inputs:
     - type: log
       {{ if var "ENABLE_JSON" }}json:
         keys_under_root: true
