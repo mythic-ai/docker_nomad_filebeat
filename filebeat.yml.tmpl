@@ -1,4 +1,4 @@
-{{ if var "NAME" }}name: {{ var "NAME" }}{{ else }}#name:{{ end }}
+name: {{ var "NOMAD_ALLOC_ID" }}
 {{ if var "TAGS" }}tags:{{ range var "TAGS" | split "," }}
   - "{{ . }}"{{ end }}{{ end }}
 filebeat:
