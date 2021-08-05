@@ -27,6 +27,7 @@ filebeat:
       keys_under_root: true
       overwrite_keys:
       paths:
+        - {{ var "NOMAD_ALLOC_DIR" }}/logs/umd/* 
       fields:
         stream: stderr
         type: log
@@ -34,7 +35,6 @@ filebeat:
         {{ if $meta_vars }}nomad:
           meta:{{ range $meta_vars | split "," }}
             {{ if var . }}{{ . | replace "NOMAD_META_" "" | lower }}: {{ var . }}{{ end }}{{ end }}{{ end }}
-        - {{ var "NOMAD_ALLOC_DIR" }}/logs/umd/* 
    {{ end }} 
    - type: log
       {{ if var "ENABLE_JSON" }}json:
