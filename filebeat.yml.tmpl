@@ -18,6 +18,9 @@ filebeat:
       fields_under_root: true
       fields:
         stream: stdout
+        job_name: {{ var "NOMAD_JOB_NAME" }}
+        task_group: {{ var "NOMAD_GROUP_NAME" }}
+        allocation_id: {{ var "NOMAD_ALLOC_ID" }}
         {{ if var "ENVIRONMENT" }}environment: {{ var "ENVIRONMENT" }}{{ else }}#environment:{{ end }}
         {{ if $meta_vars }}nomad:
           meta:{{ range $meta_vars | split "," }}
@@ -35,7 +38,32 @@ filebeat:
         - {{ var "NOMAD_TASK_NAME" }}
       fields_under_root: true
       fields:
-        stream: stdout
+        stream: umd_logs
+        job_name: {{ var "NOMAD_JOB_NAME" }}
+        task_group: {{ var "NOMAD_GROUP_NAME" }}
+        allocation_id: {{ var "NOMAD_ALLOC_ID" }}
+        {{ if var "ENVIRONMENT" }}environment: {{ var "ENVIRONMENT" }}{{ else }}#environment:{{ end }}
+        {{ if $meta_vars }}nomad:
+          meta:{{ range $meta_vars | split "," }}
+            {{ if var . }}{{ . | replace "NOMAD_META_" "" | lower }}: {{ var . }}{{ end }}{{ end }}{{ end }}
+    {{ end }} 
+    {{ if var "CLI_SESSION" }}
+    - type: log
+      {{ if var "ENABLE_JSON" }}json:
+      keys_under_root: true
+      overwrite_keys: true
+      {{ if var "ADD_JSON_ERROR_KEY" }}add_error_key: true{{ end }}
+      {{ if var "JSON_MESSAGE_KEY" }}message_key: {{ var "JSON_MESSAGE_KEY" }}{{ end }}{{ end }}
+      paths:
+        - {{ var "NOMAD_ALLOC_DIR" }}/logs/cli_session_script*
+      exclude_files:
+        - {{ var "NOMAD_TASK_NAME" }}
+      fields_under_root: true
+      fields:
+        stream: cli_session_script
+        job_name: {{ var "NOMAD_JOB_NAME" }}
+        task_group: {{ var "NOMAD_GROUP_NAME" }}
+        allocation_id: {{ var "NOMAD_ALLOC_ID" }}
         {{ if var "ENVIRONMENT" }}environment: {{ var "ENVIRONMENT" }}{{ else }}#environment:{{ end }}
         {{ if $meta_vars }}nomad:
           meta:{{ range $meta_vars | split "," }}
@@ -54,6 +82,9 @@ filebeat:
       fields_under_root: true
       fields:
         stream: stderr
+        job_name: {{ var "NOMAD_JOB_NAME" }}
+        task_group: {{ var "NOMAD_GROUP_NAME" }}
+        allocation_id: {{ var "NOMAD_ALLOC_ID" }}
         type: log
         {{ if var "ENVIRONMENT" }}environment: {{ var "ENVIRONMENT" }}{{ else }}#environment:{{ end }}
         {{ if $meta_vars }}nomad:
