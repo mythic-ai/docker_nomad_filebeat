@@ -12,6 +12,6 @@ done
 sigil -f ./filebeat.yml.tmpl meta_vars=$meta_vars > ./filebeat.yml
 
 if [[ $DEBUG -eq 'true' ]]
-   filebeat_option='-e'
+   then filebeat_option='-e'
 fi
 filebeat
