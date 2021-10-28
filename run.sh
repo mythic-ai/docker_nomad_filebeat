@@ -9,12 +9,9 @@ for v in $(env | grep ^NOMAD_META_ | cut -d= -f1); do
   fi
 done
 
+export DEVICE_ID=$(python get_device_ids.py)
 sigil -f ./filebeat.yml.tmpl meta_vars=$meta_vars > ./filebeat.yml
 
-#if [[ $DEBUG -eq 'true' ]]
-#   then filebeat_option='-e'
-#fi
-#filebeat
-#!/usr/bin/dumb-init /bin/sh
+
 
 exec "$@"

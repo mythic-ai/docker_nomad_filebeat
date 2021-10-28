@@ -29,7 +29,8 @@ RUN set -ex \
   && rm -rf filebeat* \
   && apk del --virtual build-tools
 
-COPY run.sh filebeat.yml.tmpl ./
-
+COPY run.sh filebeat.yml.tmpl get_device_ids.py ./
+RUN apk add --update --no-cache python py-pip
+RUN pip install requests
 ENTRYPOINT ["./run.sh"]
 CMD ["filebeat", "-e"]

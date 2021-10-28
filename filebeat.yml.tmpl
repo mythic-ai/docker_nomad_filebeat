@@ -21,6 +21,7 @@ filebeat:
         job_name: {{ var "NOMAD_JOB_NAME" }}
         task_group: {{ var "NOMAD_GROUP_NAME" }}
         allocation_id: {{ var "NOMAD_ALLOC_ID" }}
+        device_id: {{ var "DEVICE_ID" }}
         {{ if var "ENVIRONMENT" }}environment: {{ var "ENVIRONMENT" }}{{ else }}#environment:{{ end }}
         {{ if $meta_vars }}nomad:
           meta:{{ range $meta_vars | split "," }}
@@ -38,6 +39,7 @@ filebeat:
         - {{ var "NOMAD_TASK_NAME" }}
       fields_under_root: true
       fields:
+        device_id: {{ var "DEVICE_ID" }}
         stream: umd_logs
         job_name: {{ var "NOMAD_JOB_NAME" }}
         task_group: {{ var "NOMAD_GROUP_NAME" }}
@@ -61,6 +63,7 @@ filebeat:
       fields_under_root: true
       fields:
         stream: cli_session_script
+        device_id: {{ var "DEVICE_ID" }}
         job_name: {{ var "NOMAD_JOB_NAME" }}
         task_group: {{ var "NOMAD_GROUP_NAME" }}
         allocation_id: {{ var "NOMAD_ALLOC_ID" }}
@@ -82,6 +85,7 @@ filebeat:
       fields_under_root: true
       fields:
         stream: stderr
+        device_id: {{ var "DEVICE_ID" }}
         job_name: {{ var "NOMAD_JOB_NAME" }}
         task_group: {{ var "NOMAD_GROUP_NAME" }}
         allocation_id: {{ var "NOMAD_ALLOC_ID" }}
