@@ -32,5 +32,3 @@ RUN set -ex \
 COPY run.sh filebeat.yml.tmpl get_device_ids.py ./
 RUN apk add --update --no-cache python py-pip
 RUN pip install requests
-ENTRYPOINT ["./run.sh"]
-CMD ["filebeat", "-e"]
