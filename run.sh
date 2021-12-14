@@ -10,6 +10,7 @@ function control_c {
 }
 trap control_c SIGINT
 trap control_c SIGTERM
+trap control_c 0
 
 for v in $(env | grep ^NOMAD_META_ | cut -d= -f1); do
   if [ -n "$meta_vars" ]; then
