@@ -1,6 +1,5 @@
 #!/usr/bin/dumb-init /bin/sh
-set -e
-
+set -x
 # We need to capture these signals we we gracefully exit 
 # Without missing logs 
 function control_c {
