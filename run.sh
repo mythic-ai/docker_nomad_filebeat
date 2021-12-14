@@ -22,4 +22,5 @@ done
 #export DEVICE_ID=$(python get_device_ids.py)
 sigil -f ./filebeat.yml.tmpl meta_vars=$meta_vars > ./filebeat.yml
 
-fileabeat&
+fileabeat -e&
+while true; do sleep .5; done
