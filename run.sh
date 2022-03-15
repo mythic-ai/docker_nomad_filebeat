@@ -7,9 +7,16 @@ function control_c {
   sleep 45
   exit 
 }
-trap control_c SIGINT
-trap control_c SIGTERM
-trap control_c 0
+function cleanup()
+{
+    echo "$1"
+    exit 0
+}
+
+trap 'cleanup SIGINT' SIGINT
+trap 'cleanup TERM' SIGTERM
+trap 'cleanup SIGABRT' SIGABRT
+trap 'cleanup SIGKILL' SIGKIL
 
 for v in $(env | grep ^NOMAD_META_ | cut -d= -f1); do
   if [ -n "$meta_vars" ]; then
