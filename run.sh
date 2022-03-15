@@ -2,14 +2,11 @@
 set -x
 # We need to capture these signals we we gracefully exit 
 # Without missing logs 
-function control_c {
-  echo "[!] waiting 45 seconds to finish writing logs before exiting..."
-  sleep 45
-  exit 
-}
 function cleanup()
 {
-    echo "$1"
+    echo "[!] Received Signal: $1"
+    echo "[!] waiting 45 seconds to finish writing logs before exiting..."
+    sleep 45
     exit 0
 }
 
