@@ -12,7 +12,7 @@ class FilebeatManager(object):
         self.thread = threading.Thread(target=self.start_filebeat, args=())
 
     def start_filebeat(self):
-      command = 'filebeat -e -c filebeat.yml --path.config /app '
+      command = 'filebeat  -c filebeat.yml --path.config /app '
       with open('filebeat.log', "w") as f:
         process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         for c in iter(lambda: process.stdout.readline(), b''): 
