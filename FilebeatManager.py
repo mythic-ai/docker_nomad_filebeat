@@ -4,6 +4,7 @@ import signal
 import sys
 import time
 import subprocess
+import logging
 
 
 
@@ -20,9 +21,9 @@ class FilebeatManager(object):
           f.buffer.write(c)
 
     def handle_sig(self, signal, frame):
-        print("received signal!")
+        logging.warning("received signal!")
         for i in range(45):
-            print("Filebeat manager will exit in {} second...".format(45-i))
+            logging.warning("Filebeat manager will exit in {} second...".format(45-i))
             time.sleep(1)
         os._exit(1)
 
@@ -41,7 +42,7 @@ class FilebeatManager(object):
         config = stdout[0].decode()
         rc = process.returncode
         if rc != 0:
-            print("Templating config returned Non-zero!")
+            logging.error("Templating config returned Non-zero!")
             config = None
       except Exception as e:
         print("Exception: {}".format(e))
@@ -50,13 +51,31 @@ class FilebeatManager(object):
 
         
 if __name__ == "__main__":
+     log_level = os.environ.get("LOG_LEVEL")
+     if not log_level or log_level not in logging.__dict__:
+         log_level = "INFO"
+         logging.basicConfig(
+         format="%(asctime)s - %(levelname)s %(message)s", level=logging.__dict__[log_level]
+     )
+     logging.info("Starting FilebeatManager...")
      mngr = FilebeatManager()
      signal.signal(signal.SIGTERM, mngr.handle_sig)
      signal.signal(signal.SIGINT, mngr.handle_sig)
+     logging.info("Generating Filebeat Config...")
      config = mngr.template_config()
      if not config:
-        print("could not generate config!")
+        logging.error("Could not generate config!")
         sys.exit(1)
-     with open("filebeat.yml", 'w') as fh:
-         fh.write(config)
+     try:
+       with open("filebeat.yml", 'w') as fh:
+           fh.write(config)
+     except Exception as e:
+       logging.error("Failed to write config file!")
+       logging.error("Exception: {}".format(e))
+       sys.exit()
+     logging.info("Config generated, launching filebeat thread...")
      mngr.thread.start()
+     logging.info("Filebeat thread is running!")
+     # Just block until signalled to do other wise
+     while True:
+       time.sleep(1)
