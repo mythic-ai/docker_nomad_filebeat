@@ -9,21 +9,30 @@ import logging
 
 
 class FilebeatManager(object):
-    def __init__(self):
+    def __init__(self, log_level):
         self.thread = threading.Thread(target=self.start_filebeat, args=())
+        self.log_level = log_level.lower()
 
     def start_filebeat(self):
-      command = 'filebeat  -c filebeat.yml --path.config /app '
-      with open('filebeat.log', "w") as f:
-        process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        for c in iter(lambda: process.stdout.readline(), b''): 
-          sys.stdout.buffer.write(c)
-          f.buffer.write(c)
+      if self.log_level == 'debug':
+        command = 'filebeat -e -c filebeat.yml --path.config /app'
+      else:
+        command = 'filebeat -c filebeat.yml --path.config /app'
+      logging.debug("Filebeat command: {}".format(command))
+      process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+      line = []
+      for c in iter(lambda: process.stdout.read(1), b''): 
+        if c.decode() != '\n':
+            line.append(c.decode())
+        else:
+            print(''.join(line))
+            line = []
 
     def handle_sig(self, signal, frame):
         logging.warning("received signal!")
         for i in range(45):
-            logging.warning("Filebeat manager will exit in {} second...".format(45-i))
+            if i  % 5 == 0: 
+              logging.warning("Filebeat manager will exit in {} second...".format(45-i))
             time.sleep(1)
         os._exit(1)
 
@@ -54,11 +63,11 @@ if __name__ == "__main__":
      log_level = os.environ.get("LOG_LEVEL")
      if not log_level or log_level not in logging.__dict__:
          log_level = "INFO"
-         logging.basicConfig(
+     logging.basicConfig(
          format="%(asctime)s - %(levelname)s %(message)s", level=logging.__dict__[log_level]
      )
      logging.info("Starting FilebeatManager...")
-     mngr = FilebeatManager()
+     mngr = FilebeatManager(log_level=log_level)
      signal.signal(signal.SIGTERM, mngr.handle_sig)
      signal.signal(signal.SIGINT, mngr.handle_sig)
      logging.info("Generating Filebeat Config...")
@@ -76,6 +85,6 @@ if __name__ == "__main__":
      logging.info("Config generated, launching filebeat thread...")
      mngr.thread.start()
      logging.info("Filebeat thread is running!")
-     # Just block until signalled to do other wise
+     # Just block until signalled to do otherwise
      while True:
        time.sleep(1)
